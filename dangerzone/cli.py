@@ -98,7 +98,7 @@ def cli_main(
     if documents_safe != []:
         print_header("Safe PDF(s) created successfully")
         for document in documents_safe:
-            click.echo(document.output_filename)
+            click.echo(click.format_filename(document.output_filename))
 
         if archive:
             print_header(
@@ -108,7 +108,7 @@ def cli_main(
     if documents_failed != []:
         print_header("Failed to convert document(s)")
         for document in documents_failed:
-            click.echo(document.input_filename)
+            click.echo(click.format_filename(document.input_filename))
         sys.exit(1)
     else:
         sys.exit(0)

@@ -21,7 +21,13 @@ from dangerzone.cli import cli_main, display_banner
 from dangerzone.document import ARCHIVE_SUBDIR, SAFE_EXTENSION
 from dangerzone.isolation_provider.qubes import is_qubes_native_conversion
 
-from . import TestBase, for_each_doc, for_each_external_doc, sample_pdf
+from . import (
+    TestBase,
+    for_each_doc,
+    for_each_external_doc,
+    sample_bad_height,
+    sample_pdf,
+)
 
 # TODO explore any symlink edge cases
 # TODO simulate ctrl-c, ctrl-d, SIGINT/SIGKILL/SIGTERM... (man 7 signal), etc?
@@ -218,6 +224,14 @@ class TestCliConversion(TestCliBasic):
         result = self.run_cli([sample_pdf, "--output-filename", output_filename])
         result.assert_success()
 
+    def test_output_filename_surrogate_escape(
+        self, tmp_path: Path, sample_pdf: str
+    ) -> None:
+        # We use \udcf0 surrogate escape which is equivalent to b"\xf0".
+        output_filename = str(tmp_path / "safe-pdf-with-invalid-utf8-\udcf0.pdf")
+        result = self.run_cli([sample_pdf, "--output-filename", output_filename])
+        result.assert_success()
+
     def test_output_filename_new_dir(self, sample_pdf: str) -> None:
         output_filename = str(Path("fake-directory") / "my-output.pdf")
         result = self.run_cli([sample_pdf, "--output-filename", output_filename])
@@ -227,6 +241,17 @@ class TestCliConversion(TestCliBasic):
         input_filename = str(Path("fake-directory") / "fake-file.pdf")
         result = self.run_cli(input_filename)
         result.assert_failure()
+
+    def test_failure_filename_surrogate_escape(
+        self, tmp_path: Path, sample_bad_height: str
+    ) -> None:
+        """Ensure printing failed document path with surrogate escapes doesn't fail."""
+        # We use \udcf0 surrogate escape which is equivalent to b"\xf0".
+        doc_path = str(tmp_path / "sample-bad-height-and-invalid-utf8-\udcf0.pdf")
+        shutil.copyfile(sample_bad_height, doc_path)
+        result = self.run_cli(doc_path)
+        result.assert_failure()
+        assert not isinstance(result.exception, UnicodeEncodeError)
 
     def test_lang_eng(self, sample_pdf: str) -> None:
         result = self.run_cli([sample_pdf, "--ocr-lang", "eng"])
@@ -238,6 +263,7 @@ class TestCliConversion(TestCliBasic):
             "“Curly_Quotes”.pdf",  # issue 144
             "Оригинал.pdf",
             "spaces test.pdf",
+            "surrogate_escape_\udcf0.pdf",  # issue 768
         ],
     )
     def test_filenames(self, filename: str, tmp_path: Path, sample_pdf: str) -> None:
