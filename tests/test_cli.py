@@ -242,6 +242,10 @@ class TestCliConversion(TestCliBasic):
         result = self.run_cli(input_filename)
         result.assert_failure()
 
+    @pytest.mark.skipif(
+        os.environ.get("DUMMY_CONVERSION", False),
+        reason="real conversion required to test conversion failure",
+    )
     def test_failure_filename_surrogate_escape(
         self, tmp_path: Path, sample_bad_height: str
     ) -> None:
