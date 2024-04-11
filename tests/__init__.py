@@ -113,11 +113,12 @@ def uncommon_text() -> str:
     * A Unicode control character that is not part of ASCII: zero-width joiner
       (U+200D)
     * An emoji: Cross Mark (U+274C)
+    * A surrogate escape used to decode an invalid UTF-8 sequence 0xF0 (U+DCF0)
     """
-    return "\033[31;1;4m BaD TeΧt \u200d ❌ \033[0m"
+    return "\033[31;1;4m BaD TeΧt \u200d ❌ \udcf0 \033[0m"
 
 
 @pytest.fixture
 def sanitized_text() -> str:
     """Return a sanitized version of the uncommon_text."""
-    return "_[31;1;4m BaD Te_t _ _ _[0m"
+    return "�[31;1;4m BaD TeΧt � ❌ � �[0m"
