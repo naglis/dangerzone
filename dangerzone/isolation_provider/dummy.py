@@ -63,9 +63,12 @@ class Dummy(IsolationProvider):
             time.sleep(0.2)
         if success:
             log.debug("Copying dummy_document.pdf to: %r", document.output_filename)
-            shutil.copy(
-                get_resource_path("dummy_document.pdf"), document.output_filename
-            )
+            try:
+                shutil.copy(
+                    get_resource_path("dummy_document.pdf"), document.output_filename
+                )
+            except Exception:
+                log.exception("Failed to copy file")
         document.mark_as_safe()
         if document.archive_after_conversion:
             document.archive()
