@@ -94,6 +94,7 @@ def cli_main(
     dangerzone.convert_documents(ocr_lang)
     documents_safe = dangerzone.get_safe_documents()
     documents_failed = dangerzone.get_failed_documents()
+    logging.debug("documents_safe: %r, documents_failed: %r", documents_safe, documents_failed)
 
     if documents_safe != []:
         print_header("Safe PDF(s) created successfully")
