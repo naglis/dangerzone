@@ -62,6 +62,7 @@ class Dummy(IsolationProvider):
                 success = False
             time.sleep(0.2)
         if success:
+            log.debug("Copying dummy_document.pdf to: %s", document.output_filename)
             shutil.copy(
                 get_resource_path("dummy_document.pdf"), document.output_filename
             )
