@@ -20,6 +20,7 @@ from strip_ansi import strip_ansi
 from dangerzone.cli import cli_main, display_banner
 from dangerzone.document import ARCHIVE_SUBDIR, SAFE_EXTENSION
 from dangerzone.isolation_provider.qubes import is_qubes_native_conversion
+from dangerzone.util import get_resource_path
 
 from . import TestBase, for_each_doc, for_each_external_doc, sample_pdf
 
@@ -217,6 +218,12 @@ class TestCliConversion(TestCliBasic):
         output_filename = str(Path(temp_dir) / "safe space.pdf")
         result = self.run_cli([sample_pdf, "--output-filename", output_filename])
         result.assert_success()
+
+    def test_output_filename_same_file_dummy_fails(self) -> None:
+        resource_path = get_resource_path("dummy_document.pdf")
+        # Using the same filename for both input and output should fail.
+        result = self.run_cli([resource_path, "--output-filename", resource_path, "--unsafe-dummy-conversion"])
+        result.assert_failure()
 
     def test_output_filename_new_dir(self, sample_pdf: str) -> None:
         output_filename = str(Path("fake-directory") / "my-output.pdf")
