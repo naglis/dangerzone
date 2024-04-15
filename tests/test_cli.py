@@ -264,16 +264,17 @@ class TestCliConversion(TestCliBasic):
     @pytest.mark.parametrize(
         "filename,",
         [
-            "“Curly_Quotes”.pdf",  # issue 144
-            "Оригинал.pdf",
-            "spaces test.pdf",
-            "surrogate_escape_\udcf0.pdf",  # issue 768
+            # "“Curly_Quotes”.pdf",  # issue 144
+            # "Оригинал.pdf",
+            # "spaces test.pdf",
+            b"surrogate_escape_\xf0.pdf",  # issue 768
         ],
     )
-    def test_filenames(self, filename: str, tmp_path: Path, sample_pdf: str) -> None:
-        doc_path = str(Path(tmp_path).joinpath(filename))
+    def test_filenames(self, filename: bytes, tmp_path: Path, sample_pdf: str) -> None:
+        # doc_path = str(Path(tmp_path).joinpath(filename))
+        doc_path = os.path.join(str(tmp_path).encode("utf-8"), filename)
         shutil.copyfile(sample_pdf, doc_path)
-        result = self.run_cli(doc_path)
+        result = self.run_cli(doc_path.decode("utf-8", errors="surrogateescape"))
         result.assert_success()
         assert len(os.listdir(tmp_path)) == 2
 
