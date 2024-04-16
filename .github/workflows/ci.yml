@@ -13,10 +13,11 @@ jobs:
       DUMMY_CONVERSION: 1
     steps:
       - uses: actions/checkout@v4
+      - run: pip install poetry
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install poetry
+          cache: 'poetry'
       - run: poetry install
       - name: Run CLI tests
         run: poetry run make test
@@ -34,10 +35,11 @@ jobs:
       DUMMY_CONVERSION: 1
     steps:
       - uses: actions/checkout@v4
+      - run: pip install poetry
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install poetry
+          cache: 'poetry'
       - run: poetry install
       - name: Run CLI tests
         run: poetry run make test
