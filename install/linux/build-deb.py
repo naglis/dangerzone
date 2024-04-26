@@ -67,6 +67,8 @@ def main():
             "--command-packages=stdeb.command",
             "sdist_dsc",
             *deb_ver_args,
+            "--compat",
+            "10",
             "bdist_deb",
         ]
     )
